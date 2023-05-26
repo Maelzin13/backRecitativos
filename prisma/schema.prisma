@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+//Universal Unique ID
+model User {
+  id        String @id @default(uuid())
+  githubId  Int    @unique
+  name      String
+  login     String
+  avatarUrl String
+
+  memoris Memory[]
+}
+
+model Memory {
+  id       String   @id @default(uuid())
+  coverUrl String
+  content  String
+  isPublic Boolean  @default(false)
+  creatAt  DateTime @default(now())
+
+  usuario User   @relation(fields: [userId], references: [id])
+  userId  String
+}
