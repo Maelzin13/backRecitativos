@@ -1,0 +1,7 @@
+# Rodar o Projeto 
+npm run dev
+http://localhost:3333
+
+# Prisma Studio
+npx prisma studio
+http://localhost:5555
