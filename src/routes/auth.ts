@@ -1,14 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { FastifyInstance } from 'fastify'
 import axios from 'axios'
-import { prisma } from '../lib/prisma'
 import { z } from 'zod'
+import { prisma } from '../lib/prisma'
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/register', async (request) => {
     const bodySchema = z.object({
       code: z.string(),
-    })  
+    })
 
     const { code } = bodySchema.parse(request.body)
 
@@ -17,7 +17,7 @@ export async function authRoutes(app: FastifyInstance) {
       null,
       {
         params: {
-          client_id: process.env.GITUHB_CLIENT_ID,
+          client_id: process.env.GITHUB_CLIENT_ID,
           client_secret: process.env.GITHUB_CLIENT_SECRET,
           code,
         },
@@ -41,13 +41,13 @@ export async function authRoutes(app: FastifyInstance) {
       name: z.string(),
       avatar_url: z.string().url(),
     })
-    
+
     const userInfo = userSchema.parse(userResponse.data)
 
-    let user =  await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
       where: {
         githubId: userInfo.id,
-      }
+      },
     })
 
     if (!user) {
@@ -61,13 +61,16 @@ export async function authRoutes(app: FastifyInstance) {
       })
     }
 
-    const token =  app.jwt.sign({
-      name: user.name,
-      avatarUrl: user.avatarUrl
-    }, {
-      sub: user.id,
-      expiresIn: '30 days'
-    })
+    const token = app.jwt.sign(
+      {
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+      },
+      {
+        sub: user.id,
+        expiresIn: '30 days',
+      },
+    )
 
     return {
       token,
