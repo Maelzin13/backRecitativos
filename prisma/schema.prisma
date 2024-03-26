@@ -3,29 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 //Universal Unique ID
 model User {
-  id        String @id @default(uuid())
-  githubId  Int    @unique
+  id        String  @id @default(uuid())
   name      String
-  login     String
-  avatarUrl String
-
-  memoris Memory[]
-}
-
-model Memory {
-  id     String @id @default(uuid())
-  userId String
-
-  coverUrl String
-  content  String
-  isPublic Boolean  @default(false)
-  creatAt  DateTime @default(now())
-
-  usuario User @relation(fields: [userId], references: [id])
+  email     String  @unique
+  password  String
+  avatarUrl String?
 }

@@ -12,6 +12,7 @@
   "license": "ISC",
   "devDependencies": {
     "@rocketseat/eslint-config": "^1.2.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.1.4",
     "dotenv": "^16.0.3",
     "eslint": "^8.40.0",
@@ -20,13 +21,14 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@fastify/cors": "^8.2.1",
+    "@fastify/cors": "^8.5.0",
     "@fastify/jwt": "^6.7.1",
-    "@fastify/multipart": "^7.6.0",
+    "@fastify/multipart": "^7.7.3",
     "@fastify/static": "^6.10.2",
     "@prisma/client": "^4.14.0",
-    "axios": "^1.4.0",
+    "axios": "^1.6.7",
+    "bcryptjs": "^2.4.3",
     "fastify": "^4.17.0",
-    "zod": "^3.21.4"
+    "zod": "^3.22.4"
   }
 }
