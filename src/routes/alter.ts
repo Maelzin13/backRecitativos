@@ -11,13 +11,12 @@ export async function alterUserRoutes(app: FastifyInstance) {
   const changePasswordSchema = z.object({
     userId: z.number(),
     currentPassword: z.string(),
-    newPassword: z.string(),
+    newPassword: z.string().min(6),
   })
 
   
   app.put('/users/change-password', async (request) => {
-    try {
-  
+    try {  
       const { userId, currentPassword, newPassword } = changePasswordSchema.parse(request.body)
 
   

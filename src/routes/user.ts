@@ -25,7 +25,7 @@ export async function userRoutes(app: FastifyInstance) {
       const existingUser = await prisma.usuarios.findUnique({
         where: { username: userData.username },
       })
-
+  
       if (existingUser) {
         return { status: 'error', message: 'Este Usuario já está em uso.' }
       }
@@ -37,8 +37,10 @@ export async function userRoutes(app: FastifyInstance) {
           password_: hashedPassword,
         },
       })
-
-      return { status: 'success', data: newUser }
+  
+      // Aqui, estamos retornando apenas os dados do usuário sem incluir a senha
+      const userDataWithoutPassword = { ...newUser, password_: undefined };
+      return { status: 'success', data: userDataWithoutPassword }
     } catch (error) {
       return { status: 'error', message: 'Erro ao criar usuário.' }
     }
@@ -64,7 +66,7 @@ export async function userRoutes(app: FastifyInstance) {
         console.log('User not found');
         return reply.status(404).send({ status: 'error', message: 'Credenciais inválidas.' });
       }
-
+  
       const userPassword = user.password_ ?? '';
       const passwordMatch = await bcrypt.compare(password_, userPassword);
   
@@ -74,7 +76,9 @@ export async function userRoutes(app: FastifyInstance) {
       }
   
       console.log('Login successful');
-      return reply.send({ status: 'success', message: 'Login bem-sucedido.', data: user });
+      // Aqui, estamos retornando apenas os dados do usuário sem incluir a senha
+      const userDataWithoutPassword = { ...user, password_: undefined };
+      return reply.send({ status: 'success', message: 'Login bem-sucedido.', data: userDataWithoutPassword });
     } catch (error) {
       console.error('Error processing login:', error);
       return reply.status(500).send({ status: 'error', message: 'Erro ao efetuar o login.' });
