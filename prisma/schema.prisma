@@ -7,11 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//Universal Unique ID
-model User {
-  id        String  @id @default(uuid())
-  name      String
-  email     String  @unique
-  password  String
-  avatarUrl String?
+model auxiliares {
+  auxiliar_id   Int           @id @default(autoincrement())
+  auxiliar_name String?       @unique(map: "auxiliar_name_unique") @db.VarChar
+  user_id       Int?
+  usuarios      usuarios?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  recitativos   recitativos[]
+}
+
+model cargo {
+  id         Int        @id @default(autoincrement())
+  cargo_type String?    @db.VarChar
+  usuarios   usuarios[]
+}
+
+model localidade {
+  id         Int        @id @default(autoincrement())
+  noma_local Int?
+  usuarios   usuarios[]
+}
+
+model recitativos {
+  id          Int         @id @default(autoincrement())
+  name        String?     @db.VarChar
+  book        String?     @db.VarChar
+  chapter     Int?
+  verse       String?     @db.VarChar
+  data        DateTime?   @db.Date
+  auxiliar_id Int?
+  auxiliares  auxiliares? @relation(fields: [auxiliar_id], references: [auxiliar_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model usuarios {
+  user_id       Int          @id @default(autoincrement())
+  username      String?      @unique @db.VarChar
+  password_     String?      @db.VarChar
+  cargo_id      Int?
+  localidade_id Int?
+  auxiliares    auxiliares[]
+  cargo         cargo?       @relation(fields: [cargo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  localidade    localidade?  @relation(fields: [localidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

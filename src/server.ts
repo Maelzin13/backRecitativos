@@ -5,6 +5,7 @@ import fastify from 'fastify'
 
 import { alterUserRoutes } from './routes/alter'
 import { userRoutes } from './routes/user'
+import { recitativosRoutes } from './routes/recitativos';
 
 
 const app = fastify();
@@ -15,6 +16,7 @@ app.register(fastifyCors, {
 
 app.register(userRoutes)
 app.register(alterUserRoutes)
+app.register(recitativosRoutes)
 
 app
   .listen({
