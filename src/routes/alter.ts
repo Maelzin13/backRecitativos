@@ -7,7 +7,6 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 export async function alterUserRoutes(app: FastifyInstance) {
-  
   const changePasswordSchema = z.object({
     userId: z.number(),
     currentPassword: z.string(),

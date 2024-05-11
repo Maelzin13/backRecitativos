@@ -22,12 +22,9 @@ interface CreateRecitativoRequest {
 }
 
 export async function recitativosRoutes(app: FastifyInstance) {
-  // Rota para criar um novo recitativo
   app.post('/recitativos', async (request: FastifyRequest<{ Body: CreateRecitativoRequest }>, reply: FastifyReply) => {
     try {      
       const { name, book, chapter, verse, data, auxiliar_name } = request.body;
-  
-      // Verifica se o auxiliar existe, caso contrário, cria um novo
       let auxiliarRow = await prisma.auxiliares.findFirst({
         where: { auxiliar_name },
       });
@@ -40,7 +37,6 @@ export async function recitativosRoutes(app: FastifyInstance) {
         });
       }
 
-      // Cria o recitativo
       const recitativo = await prisma.recitativos.create({
         data: {
             name,
@@ -51,7 +47,6 @@ export async function recitativosRoutes(app: FastifyInstance) {
             auxiliar_id: auxiliarRow.auxiliar_id
         }
       });
-      console.log(recitativo)
 
       return reply.status(201).send({
         recitativoId: recitativo.id,
@@ -63,8 +58,7 @@ export async function recitativosRoutes(app: FastifyInstance) {
       return reply.status(500).send({ error: 'Erro Interno do Servidor' });
     }
   });
-
-  // Rota para listar recitativos
+  
   app.get('/recitativos', async (request: FastifyRequest<{ Querystring: RequestQuery }>, reply: FastifyReply) => {
     try {
       const search = request.query.search;
@@ -84,22 +78,18 @@ export async function recitativosRoutes(app: FastifyInstance) {
       return { error: 'Erro Interno do Servidor' };
     }
   });
-
-  // Rota para atualizar um recitativo
+  
   app.put('/recitativos/:id', async (request: FastifyRequest<{ Params: RequestParams, Body: CreateRecitativoRequest }>, reply: FastifyReply) => {
     try {
       const recitativoId = parseInt(request.params.id);
       const { name, book, chapter, verse, data, auxiliar_name } = request.body;
-      
-      // Verifica se o recitativo existe
       const recitativoExistente = await prisma.recitativos.findUnique({
         where: { id: recitativoId },
       });
       if (!recitativoExistente) {
         return reply.status(404).send({ error: 'Recitativo não encontrado' });
       }
-
-      // Verifica se o auxiliar existe, caso contrário, cria um novo
+      
       let auxiliarRow = await prisma.auxiliares.findFirst({
         where: { auxiliar_name },
       });
@@ -111,8 +101,7 @@ export async function recitativosRoutes(app: FastifyInstance) {
           }
         });
       }
-
-      // Atualiza o recitativo
+      
       await prisma.recitativos.update({
         where: { id: recitativoId },
         data: {
@@ -133,8 +122,7 @@ export async function recitativosRoutes(app: FastifyInstance) {
       return reply.status(500).send({ error: 'Erro Interno do Servidor' });
     }
   });
-
-  // Rota para deletar um recitativo
+  
   app.delete('/recitativos/:id', async(request: FastifyRequest<{ Params: RequestParams }>, reply) => {
     try {
       const recitativoId = parseInt(request.params.id);

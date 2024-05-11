@@ -12,13 +12,11 @@ interface LoginRequestBody {
 }
 
 export async function userRoutes(app: FastifyInstance) {
-
   const createUserSchema = z.object({
     username: z.string(),
     password_: z.string().min(6),
   })
-
-  // Rota para criar um novo usuário
+  
   app.post('/users', async (request) => {
     try {
       const userData = createUserSchema.parse(request.body)
@@ -31,22 +29,34 @@ export async function userRoutes(app: FastifyInstance) {
       }
     
       const hashedPassword = await bcrypt.hash(userData.password_, 10)
-      const newUser = await prisma.usuarios.create({
+      await prisma.usuarios.create({
         data: {
           username: userData.username,
           password_: hashedPassword,
         },
       })
   
-      // Aqui, estamos retornando apenas os dados do usuário sem incluir a senha
-      const userDataWithoutPassword = { ...newUser, password_: undefined };
-      return { status: 'success', data: userDataWithoutPassword }
+      // const newUser = await prisma.usuarios.create({
+      //   data: {
+      //     username: userData.username,
+      //     password_: hashedPassword,
+      //   },
+      // })
+  
+      // // Criar um auxiliar com o mesmo nome do usuário
+      // await prisma.auxiliares.create({
+      //   data: {
+      //     auxiliar_name: newUser.username, // Nome do auxiliar definido como o nome do usuário
+      //     user_id: newUser.user_id // Associando o usuário ao auxiliar
+      //   }
+      // })
+  
+      return { status: 'success',  message: 'Usuario criado com sucesso.'}
     } catch (error) {
       return { status: 'error', message: 'Erro ao criar usuário.' }
     }
   })
-
-  // Rota para efetuar o login do usuário
+  
   app.post('/login', async (request: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) => {
     try {
       console.log('Received login request:', request.body);
@@ -60,6 +70,9 @@ export async function userRoutes(app: FastifyInstance) {
   
       const user = await prisma.usuarios.findUnique({
         where: { username },
+        // include: {
+        //   auxiliares: true // Inclui os auxiliares associados ao usuário
+        // }
       });
   
       if (!user) {
@@ -74,11 +87,11 @@ export async function userRoutes(app: FastifyInstance) {
         console.log('Password does not match');
         return reply.status(401).send({ status: 'error', message: 'Credenciais inválidas.' });
       }
+      
+      // const auxiliarName = user.auxiliares?.[0]?.auxiliar_name ?? '';
   
-      console.log('Login successful');
-      // Aqui, estamos retornando apenas os dados do usuário sem incluir a senha
-      const userDataWithoutPassword = { ...user, password_: undefined };
-      return reply.send({ status: 'success', message: 'Login bem-sucedido.', data: userDataWithoutPassword });
+      // return reply.send({ status: 'success', message: 'Login bem-sucedido.', auxiliarName });
+      return reply.send({ status: 'success', message: 'Login bem-sucedido.' });
     } catch (error) {
       console.error('Error processing login:', error);
       return reply.status(500).send({ status: 'error', message: 'Erro ao efetuar o login.' });
