@@ -59,12 +59,10 @@ export async function userRoutes(app: FastifyInstance) {
   
   app.post('/login', async (request: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) => {
     try {
-      console.log('Received login request:', request.body);
       const { username, password_ } = request.body;
   
       // Verifica se o email ou a senha estão vazios
       if (!username || !password_) {
-        console.log('Empty user or password');
         return reply.status(400).send({ status: 'error', message: 'Usuario e senha são obrigatórios.' });
       }
   
@@ -76,7 +74,6 @@ export async function userRoutes(app: FastifyInstance) {
       });
   
       if (!user) {
-        console.log('User not found');
         return reply.status(404).send({ status: 'error', message: 'Credenciais inválidas.' });
       }
   
@@ -91,7 +88,11 @@ export async function userRoutes(app: FastifyInstance) {
       // const auxiliarName = user.auxiliares?.[0]?.auxiliar_name ?? '';
   
       // return reply.send({ status: 'success', message: 'Login bem-sucedido.', auxiliarName });
-      return reply.send({ status: 'success', message: 'Login bem-sucedido.' });
+      const userDataWithoutPassword = {
+        user_id: user.user_id,
+        username: user.username
+      };
+      return reply.send({ status: 'success', message: 'Login bem-sucedido.', data: userDataWithoutPassword });
     } catch (error) {
       console.error('Error processing login:', error);
       return reply.status(500).send({ status: 'error', message: 'Erro ao efetuar o login.' });
