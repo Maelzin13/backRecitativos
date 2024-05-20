@@ -10,6 +10,7 @@ interface RequestQuery {
 
 interface RequestParams {
   id: string;
+  userId: number;
 }
 
 interface CreateRecitativoRequest {
@@ -78,6 +79,38 @@ export async function recitativosRoutes(app: FastifyInstance) {
       return { error: 'Erro Interno do Servidor' };
     }
   });
+
+  app.get('/recitativos/:id', async (request: FastifyRequest<{ Params: RequestParams }>, reply: FastifyReply) => {
+    try {
+      const userId = parseInt(request.params.id);
+      
+      // Primeiro, buscamos os auxiliares associados ao usuário
+      const auxiliar = await prisma.auxiliares.findFirst({
+        where: {
+          user_id: userId,
+        },
+        include: {
+          recitativos: {
+            include: {              
+              auxiliares: {
+                select: {
+                  auxiliar_name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      if (!auxiliar) {
+        return reply.status(404).send({ error: 'Auxiliar não encontrado para o usuário especificado' });
+      }
+
+      return auxiliar.recitativos; 
+    } catch (error) {
+      console.error('Erro ao buscar recitativos por ID do usuário:', error);
+      return reply.status(500).send({ error: 'Erro Interno do Servidor' });
+    }
+  });
   
   app.put('/recitativos/:id', async (request: FastifyRequest<{ Params: RequestParams, Body: CreateRecitativoRequest }>, reply: FastifyReply) => {
     try {
@@ -109,7 +142,7 @@ export async function recitativosRoutes(app: FastifyInstance) {
           book,
           chapter,
           verse,
-          data,
+          data: new Date(data).toISOString(),
           auxiliar_id: auxiliarRow.auxiliar_id
         }
       });
