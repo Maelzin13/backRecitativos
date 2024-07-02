@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
 

@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model auxiliares {
@@ -13,6 +15,8 @@ model auxiliares {
   user_id       Int?
   usuarios      usuarios?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
   recitativos   recitativos[]
+
+  @@index([user_id], map: "IX_AUXILIARES_USER_ID")
 }
 
 model cargo {
@@ -36,6 +40,8 @@ model recitativos {
   data        DateTime?   @db.Date
   auxiliar_id Int?
   auxiliares  auxiliares? @relation(fields: [auxiliar_id], references: [auxiliar_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([auxiliar_id], map: "IX_RECITATIVOS_AUXILIAR_ID")
 }
 
 model usuarios {
@@ -47,4 +53,7 @@ model usuarios {
   auxiliares    auxiliares[]
   cargo         cargo?       @relation(fields: [cargo_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   localidade    localidade?  @relation(fields: [localidade_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([cargo_id], map: "IX_USUARIOS_CARGO_ID")
+  @@index([localidade_id], map: "IX_USUARIOS_LOCALIDADE_ID")
 }
